@@ -211,6 +211,10 @@ def verify_code(request):
     if 'user_id' in request.session:
         return redirect('index')
 
+    if 'reset_email' not in request.session:
+        context = {"msg":"이메일 인증을 다시 시작해주세요", "url" : "/users/findpassword"}
+        return render(request, 'alert.html', context)
+
     if request.method != 'POST' :
         return render(request, "users/verify_code.html")
     else :
@@ -221,6 +225,7 @@ def verify_code(request):
             return render(request, 'alert.html', context)
         try:
             user = User.objects.get(user_email=email, reset_password_token=code)
+            request.session['user'] = user
             return redirect('resetpassword')
         except User.DoesNotExist:
             context = {"msg" : "인증 코드가 올바르지 않습니다", "url" : "/users/verify_code"}
@@ -232,7 +237,8 @@ def resetpassword(request):
         return redirect('index')
 
     email = request.session.get('reset_email')
-    if not email:
+
+    if 'user' not in request.session:
         context = {"msg":"이메일 인증을 다시 시작해주세요", "url" : "/users/findpassword"}
         return render(request, 'alert.html', context)
 
