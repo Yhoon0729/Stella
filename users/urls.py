@@ -25,4 +25,10 @@ urlpatterns = [
     path("signin/", views.signin, name="signin"),
     path("signout/", views.signout, name="signout"),
     path("userinfo/", views.userinfo, name="userinfo"),
+    path("userupdate/", views.userupdate, name="userupdate"),
+    path("passupdate/", views.passupdate, name="passupdate"),
+    path("userdelete/", views.userdelete, name="userdelete"),
+    path("findpassword/", views.findpassword, name="findpassword"),
+    path("verify_code/", views.verify_code, name="verify_code"),
+    path("resetpassword/", views.resetpassword, name="resetpassword"),
 ]

@@ -130,3 +130,13 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# 이메일 서비스 Amazon ses
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.ap-northeast-2.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'AKIAR72PHSNYEB2EHJI5'
+EMAIL_HOST_PASSWORD = 'BGfQDxon0DkP2araoE6ofSAZyVX/9k+uwkFE4yXnpgXL'
+DEFAULT_FROM_EMAIL = 'vfdgy0729@gmail.com'

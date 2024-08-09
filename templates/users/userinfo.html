@@ -44,11 +44,14 @@
                         </div>
                     </div>
                     <div class="flex justify-center space-x-4 mt-8">
-                        <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition">
+                        <a href="{% url 'userupdate' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition">
                             정보 수정
                         </a>
-                        <a href="#" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition">
+                        <a href="{% url 'passupdate' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition">
                             비밀번호 변경
+                        </a>
+                        <a href="{% url 'userdelete' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full transition" onclick="return confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
+                            회원탈퇴
                         </a>
                     </div>
                 </div>

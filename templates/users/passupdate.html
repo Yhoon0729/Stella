@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stella - 비밀번호 변경</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/passupdate.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+    {% include 'layouts/header.html' %}
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+            <div class="p-8">
+                <h2 class="text-3xl font-bold mb-6 text-center gradient-text">비밀번호 변경</h2>
+                <form id="change-password-form" method="post" action="{% url 'passupdate' %}">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div>
+                            <label for="current_password" class="block mb-1">현재 비밀번호</label>
+                            <input type="password" id="current_password" name="current_password" required
+                                   class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="new_password" class="block mb-1">새 비밀번호</label>
+                            <input type="password" id="new_password" name="new_password" required
+                                   class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="confirm_password" class="block mb-1">새 비밀번호 확인</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required
+                                   class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition">
+                            비밀번호 변경
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
+    <script src="{% static 'js/passupdate.js' %}"></script>
+</body>
