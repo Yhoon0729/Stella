@@ -1,8 +1,6 @@
 import random
 import string
-import uuid
 
-from django.conf import settings
 from django.contrib import auth, messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -14,7 +12,8 @@ from users.models import User
 
 def signup(request) :
     if 'user_id' in request.session:
-        return redirect('index')
+        context = {"msg": "로그아웃 하셔야 됩니다!!", "url": "/"}
+        return render(request, "alert.html", context)
 
     if request.method != 'POST' :
         return render(request, "users/signup.html")
@@ -25,7 +24,7 @@ def signup(request) :
         user_password = request.POST['user_password']
         confirm_password = request.POST['confirm_password']
         gender = request.POST['gender']
-        
+
         if User.objects.filter(user_id=user_id).exists():
             context = {"msg" : "이미 존재하는 아이디 입니다", "url" : "/users/signup"}
             return render(request, "alert.html", context)
@@ -74,6 +73,7 @@ def signin(request) :
 def signout(request) :
     if 'user_id' not in request.session:
         return redirect('index')
+    
     auth.logout(request)
     context = {"msg" : "ㅂㅇㅂㅇ", "url" : "/users/signin"}
     return render(request, "alert.html", context)
@@ -117,6 +117,7 @@ def userupdate(request) :
 def passupdate(request) :
     if 'user_id' not in request.session:
         return redirect('index')
+
 
     user = User.objects.get(user_id=request.session['user_id'])
 
