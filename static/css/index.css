@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #111827;
+    color: #E5E7EB;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 인덱스 페이지 특정 스타일 */
+.hero-section {
+    background: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('/static/images/stock-background.jpg');
+    background-size: cover;
+    background-position: center;
+}

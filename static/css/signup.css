@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 회원가입 폼 스타일 */
+#signup-form input[type="text"],
+#signup-form input[type="email"],
+#signup-form input[type="password"],
+#signup-form select {
+    transition: all 0.3s ease;
+}
+
+#signup-form input[type="text"]:focus,
+#signup-form input[type="email"]:focus,
+#signup-form input[type="password"]:focus,
+#signup-form select:focus {
+    transform: scale(1.02);
+}
+
+/* 체크박스 스타일 */
+#agree-terms {
+    accent-color: #3B82F6;
+}

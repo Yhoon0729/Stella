@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stella - 회원가입</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/signup.css' %}" rel="stylesheet">
+</head>
+<body class="min-h-screen flex flex-col bg-gray-900 text-white">
+    {% include 'layouts/header.html' %}
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <section class="max-w-md mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold mb-6 text-center gradient-text">Stella 회원가입</h2>
+            <form id="signup-form" class="space-y-4" method="post" action="{% url 'signup' %}">
+                {% csrf_token %}
+                <div>
+                    <label for="user_id" class="block mb-1">아이디 (20자 이내)</label>
+                    <input type="text" id="user_id" name="user_id" required maxlength="20"
+                           class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="user_name" class="block mb-1">사용자 이름</label>
+                    <input type="text" id="user_name" name="user_name" required maxlength="50"
+                           class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="user_email" class="block mb-1">이메일</label>
+                    <input type="email" id="user_email" name="user_email" required maxlength="100"
+                           class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="user_password" class="block mb-1">비밀번호</label>
+                    <input type="password" id="user_password" name="user_password" required
+                           class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="confirm_password" class="block mb-1">비밀번호 확인</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required
+                           class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="gender" class="block mb-1">성별</label>
+                    <select id="gender" name="gender" required
+                            class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택하세요</option>
+                        <option value="1">남성</option>
+                        <option value="0">여성</option>
+                    </select>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="agree-terms" name="agree-terms" required
+                           class="mr-2 focus:ring-2 focus:ring-blue-500">
+                    <label for="agree-terms">이용약관에 동의합니다</label>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition">
+                    가입하기
+                </button>
+            </form>
+        </section>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
+    <script src="{% static 'js/signup.js' %}"></script>
+</body>
+</html>
