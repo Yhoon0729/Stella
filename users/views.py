@@ -73,7 +73,7 @@ def signin(request) :
 def signout(request) :
     if 'user_id' not in request.session:
         return redirect('index')
-    
+
     auth.logout(request)
     context = {"msg" : "ㅂㅇㅂㅇ", "url" : "/users/signin"}
     return render(request, "alert.html", context)
@@ -193,12 +193,18 @@ def findpassword(request):
 
     if request.method != 'POST':
         return render(request, "users/findpassword.html")
-    else :
+    else:
+        user_id = request.POST.get('user_id')
         user_email = request.POST.get('user_email')
+
+        if not user_id or not user_email:
+            context = {"msg": "아이디와 이메일을 모두 입력해주세요.", "url": "/users/findpassword"}
+            return render(request, 'alert.html', context)
+
         try:
-            user = User.objects.get(user_email=user_email)
-        except:
-            context = {"msg" : "존재하지 않는 이메일 입니다.", "url" : "/users/findpassword"}
+            user = User.objects.get(user_id=user_id, user_email=user_email)
+        except User.DoesNotExist:
+            context = {"msg": "입력한 정보와 일치하는 사용자가 없습니다.", "url": "/users/findpassword"}
             return render(request, 'alert.html', context)
 
         code = generate_verification_code()
@@ -206,6 +212,7 @@ def findpassword(request):
         user.save()
         send_verification_email(user_email, code)
         request.session['reset_email'] = user_email
+        request.session['reset_user_id'] = user_id
         return redirect('verify_code')
 
 def verify_code(request):
@@ -226,7 +233,7 @@ def verify_code(request):
             return render(request, 'alert.html', context)
         try:
             user = User.objects.get(user_email=email, reset_password_token=code)
-            request.session['user'] = user
+            request.session['user_email'] = user.user_email
             return redirect('resetpassword')
         except User.DoesNotExist:
             context = {"msg" : "인증 코드가 올바르지 않습니다", "url" : "/users/verify_code"}
@@ -238,10 +245,6 @@ def resetpassword(request):
         return redirect('index')
 
     email = request.session.get('reset_email')
-
-    if 'user' not in request.session:
-        context = {"msg":"이메일 인증을 다시 시작해주세요", "url" : "/users/findpassword"}
-        return render(request, 'alert.html', context)
 
     if request.method != 'POST' :
         return render(request, "users/resetpassword.html")
