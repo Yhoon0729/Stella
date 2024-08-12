@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import FinanceDataReader as fdr
 from datetime import datetime, timedelta
@@ -19,10 +19,10 @@ def stock_info(request, stock_code):
     user_id = request.session.get('user_id')
 
     # KOSPI 목록 가져오기
-    kospi_stocks = fdr.StockListing('KOSPI')
+    krx_stocks = fdr.StockListing('KRX')
 
     # 해당 stock_code의 주식 정보 찾기
-    stock_info = kospi_stocks[kospi_stocks['Code'] == stock_code]
+    stock_info = krx_stocks[krx_stocks['Code'] == stock_code]
 
     if stock_info.empty:
         # 주식 코드가 KOSPI 목록에 없는 경우
@@ -64,3 +64,45 @@ def chart_data(request, stock_code):
         'prices': df['Close'].tolist(),
     }
     return JsonResponse(data)
+
+
+def search_stocks(request):
+    query = request.GET.get('query', '').strip()
+    if query:
+        try:
+            # KRX 주식 목록을 가져옵니다
+            all_stocks = fdr.StockListing('KRX')
+
+            # 주식 코드가 query로 시작하는 항목을 필터링합니다
+            results = all_stocks[all_stocks['Code'].str.startswith(query)]
+
+
+            # 결과를 리스트로 변환합니다 (최대 5개)
+            stocks = [{'code': row['Code'], 'name': row['Name']}
+                      for _, row in results.head(5).iterrows()]
+
+            return JsonResponse({'stocks': stocks})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'stocks': []})
+
+
+def stock_redirect(request):
+    query = request.GET.get('query', '')
+    krx_stocks = fdr.StockListing('KRX')
+
+    # 정확한 종목코드 매치
+    if query in krx_stocks['Code'].values:
+        return redirect('info', stock_code=query)
+
+    # 정확한 종목명 매치
+    exact_match = krx_stocks[krx_stocks['Name'] == query]
+    if not exact_match.empty:
+        return redirect('info', stock_code=exact_match.iloc[0]['Code'])
+
+    # 매치되는 결과가 없으면 검색 페이지에 쿼리와 함께 렌더링
+    return render(request, 'stock/search_stocks.html', {'query': query})
+
+
+def search_page(request):
+    return render(request, 'stock/search_stocks.html')

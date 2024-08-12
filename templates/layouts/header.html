@@ -4,7 +4,7 @@
         <h1 class="text-2xl font-bold gradient-text"><a href="{% url 'index' %}">Stella</a></h1>
         <ul class="flex space-x-4">
             <li><a href="{% url 'index' %}" class="hover:text-blue-400 transition">홈</a></li>
-            <li><a href="#" class="hover:text-blue-400 transition">종목 정보</a></li>
+            <li><a href="{% url 'search_page' %}" class="hover:text-blue-400 transition">종목 정보</a></li>
             <li><a href="#" class="hover:text-blue-400 transition">토론방</a></li>
             {% if request.session.user_id %}
                 <li><a href="{% url 'userinfo' %}" class="hover:text-blue-400 transition">내 정보</a></li>

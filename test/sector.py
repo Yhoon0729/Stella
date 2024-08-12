@@ -1,55 +1,25 @@
 import requests
-import pandas as pd
-import io
+from bs4 import BeautifulSoup
 
-def get_stock_sector():
-    gen_otp_url = 'http://data.krx.co.kr/comm/fileDn/GenerateOTP/generate.cmd'
-    gen_otp_data = {
-        'mktId': 'STK',
-        'trdDd': '20230629',
-        'money': '1',
-        'csvxls_isNo': 'false',
-        'name': 'fileDown',
-        'url': 'dbms/MDC/STAT/standard/MDCSTAT03901'
-    }
+def get_stock_industry(stock_code):
+    url = f"https://finance.naver.com/item/main.nhn?code={stock_code}"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
     
-    headers = {'Referer': 'http://data.krx.co.kr/contents/MDC/MDI/mdiLoader'}
-    otp = requests.post(gen_otp_url, gen_otp_data, headers=headers).text
+    # 산업 정보를 포함하는 테이블을 찾습니다
+    table = soup.select_one('table.table_dot_h')
     
-    down_url = 'http://data.krx.co.kr/comm/fileDn/download_csv/download.cmd'
-    down_data = {'code': otp}
+    if table:
+        # 테이블의 모든 행을 순회합니다
+        for row in table.select('tr'):
+            th = row.select_one('th')
+            td = row.select_one('td')
+            if th and td and '산업' in th.text:
+                return td.text.strip()
     
-    r = requests.post(down_url, down_data, headers=headers)
-    
-    df = pd.read_csv(io.BytesIO(r.content), encoding='EUC-KR')
-    print(df.columns)  # 열 이름 출력
-    return df
-
-def get_stock_info(stock_code):
-    df = get_stock_sector()
-    # 종목코드 열의 실제 이름을 확인하고 수정
-    code_column = '종목코드'  # 또는 'ISU_CD' 등 실제 열 이름으로 수정
-    if code_column not in df.columns:
-        print(f"Available columns: {df.columns}")
-        return None
-    
-    # 종목코드를 문자열로 변환하고 앞에 0을 채워 6자리로 만듦
-    stock_code = str(stock_code).zfill(6)
-    stock_info = df[df[code_column] == stock_code]
-    
-    if not stock_info.empty:
-        return {
-            'name': stock_info['종목명'].values[0] if '종목명' in df.columns else 'N/A',
-            'sector': stock_info['업종명'].values[0] if '업종명' in df.columns else 'N/A',
-            'industry': stock_info['산업군'].values[0] if '산업군' in df.columns else 'N/A'
-        }
-    return None
+    return "정보 없음"
 
 # 사용 예
-stock_info = get_stock_info('005930')  # 삼성전자의 정보
-if stock_info:
-    print(f"종목명: {stock_info['name']}")
-    print(f"업종: {stock_info['sector']}")
-    print(f"산업군: {stock_info['industry']}")
-else:
-    print("종목 정보를 찾을 수 없습니다.")
+stock_code = '005930'  # 삼성전자
+industry = get_stock_industry(stock_code)
+print(f"종목코드 {stock_code}의 산업: {industry}")

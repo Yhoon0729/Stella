@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식 검색 - Stella</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/stock_search.css' %}">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+    {% include 'layouts/header.html' %}
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <section class="hero-section text-center mb-12 py-20 rounded-lg">
+            <h1 class="text-4xl font-bold mb-4 gradient-text">주식 종목 검색</h1>
+            <p class="text-xl mb-8">원하는 주식 정보를 빠르게 찾아보세요</p>
+        </section>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <form action="{% url 'stock_redirect' %}" method="get" id="stockSearchForm" class="mb-4">
+                <div class="flex">
+                    <input type="text" name="query" id="stock-search"
+                           placeholder="종목명 또는 코드 검색" autocomplete="off"
+                           class="flex-grow p-2 rounded-l-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r-md transition duration-300">
+                        검색
+                    </button>
+                </div>
+            </form>
+            <div id="search-results" class="mt-2 space-y-2"></div>
+        </div>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/stock_search.js' %}"></script>
+</body>
+</html>
