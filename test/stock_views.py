@@ -1,6 +1,8 @@
+import asyncio
 import os
 from functools import lru_cache
 
+import aiohttp
 import pandas as pd
 from django.conf import settings
 from django.core.cache import cache
@@ -13,54 +15,31 @@ from datetime import datetime, timedelta
 from comments.views import get_comments
 
 
-@lru_cache(maxsize=1)
-def get_krx_listing():
-    return fdr.StockListing('KRX')
-
-
-def cached_data_reader(code, start_date, end_date):
-    cache_key = f'stock_data_{code}_{start_date}_{end_date}'
-    cached_data = cache.get(cache_key)
-    if cached_data is not None:
-        return pd.read_json(cached_data)
-
-    data = fdr.DataReader(code, start_date, end_date)
-    cache.set(cache_key, data.to_json(), timeout=60)  # 1시간 동안 캐시
-    return data
-
-def index(request):
-    # KRX 주식 목록 가져오기
-    krx_stocks = get_krx_listing()
-
-    # 상위 3개 종목 선택 (등락률 기준)
-    top_3_ChagesRatio = krx_stocks.sort_values(by='ChagesRatio', ascending=False).head(3)
-
-    # 등락 상위 3개 종목 주식 데이터 리스트로 준비
-    top_3_stocks = []
-    for i in range(len(top_3_ChagesRatio)):
-        stock_data = {
-            'code': top_3_ChagesRatio.iloc[i].Code,
-            'name': top_3_ChagesRatio.iloc[i].Name,
-            'close': top_3_ChagesRatio.iloc[i].Close,
-            'change': top_3_ChagesRatio.iloc[i].Changes,
-            'chagesRatio':top_3_ChagesRatio.iloc[i].ChagesRatio,
-        }
-        top_3_stocks.append(stock_data)
-
-    context = {
-        'top_3_stocks' : top_3_stocks,
-    }
-    return render(request, 'index.html', context)
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
 
 
 def stock_info(request, stock_code):
     user_id = request.session.get('user_id')
-    krx_stocks = get_krx_listing()
+
+    # KOSPI 목록 가져오기
+    krx_stocks = fdr.StockListing('KRX')
+
+    # 해당 stock_code의 주식 정보 찾기
     stock_info = krx_stocks[krx_stocks['Code'] == stock_code]
+
+    # Theme를 fdr에 merge
     theme_df = pd.read_excel('test/theme.xlsx')
+
     stock_info = stock_info.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
 
     if stock_info.empty:
+        # 주식 코드가 KOSPI 목록에 없는 경우
         stock_data = {
             'code': stock_code,
             'name': 'Unknown',
@@ -70,10 +49,11 @@ def stock_info(request, stock_code):
             'volume': 'N/A',
         }
     else:
+        # 주식 코드가 KOSPI 목록에 있는 경우
         stock_data = {
             'code': stock_code,
             'name': stock_info['Name'].values[0],
-            'theme': stock_info['Theme'].values[0],
+            'theme':stock_info['Theme'].values[0],
             'price': stock_info['Close'].values[0],
             'change': stock_info['Changes'].values[0],
             'change_percent': stock_info['ChagesRatio'].values[0],
@@ -81,6 +61,7 @@ def stock_info(request, stock_code):
         }
 
     comments = get_comments(stock_code)
+
     return render(request, 'stock/info.html', {
         'user_id': user_id,
         'stock': stock_data,
@@ -91,7 +72,8 @@ def stock_info(request, stock_code):
 def chart_data(request, stock_code):
     end_date = datetime.now()
     start_date = end_date - timedelta(days=30)
-    df = cached_data_reader(stock_code, start_date, end_date)
+    df = fdr.DataReader(stock_code, start_date, end_date)
+
     data = {
         'labels': df.index.strftime('%Y-%m-%d').tolist(),
         'prices': df['Close'].tolist(),
@@ -103,10 +85,17 @@ def search_stocks(request):
     query = request.GET.get('query', '').strip()
     if query:
         try:
-            all_stocks = get_krx_listing()
+            # KRX 주식 목록을 가져옵니다
+            all_stocks = fdr.StockListing('KRX')
+
+            # 주식 코드가 query로 시작하는 항목을 필터링합니다
             results = all_stocks[all_stocks['Code'].str.startswith(query)]
+
+
+            # 결과를 리스트로 변환합니다 (최대 5개)
             stocks = [{'code': row['Code'], 'name': row['Name']}
                       for _, row in results.head(5).iterrows()]
+
             return JsonResponse({'stocks': stocks})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
@@ -115,48 +104,80 @@ def search_stocks(request):
 
 def stock_redirect(request):
     query = request.GET.get('query', '')
-    krx_stocks = get_krx_listing()
+    krx_stocks = fdr.StockListing('KRX')
+
+    # 정확한 종목코드 매치
     if query in krx_stocks['Code'].values:
         return redirect('info', stock_code=query)
+
+    # 정확한 종목명 매치
     exact_match = krx_stocks[krx_stocks['Name'] == query]
     if not exact_match.empty:
         return redirect('info', stock_code=exact_match.iloc[0]['Code'])
+
+    # 매치되는 결과가 없으면 검색 페이지에 쿼리와 함께 렌더링
     return render(request, 'stock/search_stocks.html', {'query': query})
 
 
 def search_page(request):
     return render(request, 'stock/search_stocks.html')
 
-
 def theme_stocks(request):
     if request.method != 'POST':
-        krx_stocks = get_krx_listing()
+        krx_stocks = fdr.StockListing('KRX')
+
+        # Theme를 fdr에 merge
         theme_df = pd.read_excel('test/theme.xlsx')
+
         krx_stocks = krx_stocks.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
+
+        # NaN 값을 가진 행 제거
         krx_stocks = krx_stocks.dropna(subset=['Theme'])
+
+        # 테마별 평균 등락률 계산
         theme_avg_change = krx_stocks.groupby('Theme')['ChagesRatio'].mean().reset_index()
         theme_avg_change = theme_avg_change.sort_values('ChagesRatio', ascending=False)
+
+        # 테마별 대장주 찾기 (등락률이 가장 높은 종목)
         theme_leaders = krx_stocks.loc[krx_stocks.groupby('Theme')['ChagesRatio'].idxmax()]
-        theme_result = theme_avg_change.merge(theme_leaders[['Theme', 'Name', 'Code', 'ChagesRatio']], on='Theme',
-                                              suffixes=('_avg', '_leader'))
+
+        # 결과 합치기
+        theme_result = theme_avg_change.merge(theme_leaders[['Theme', 'Name', 'Code', 'ChagesRatio']], on='Theme', suffixes=('_avg', '_leader'))
         theme_result = theme_result.sort_values('ChagesRatio_avg', ascending=False)
+
+        # DataFrame을 딕셔너리 리스트로 변환
         theme_result_list = theme_result.to_dict('records')
-        paginator = Paginator(theme_result_list, 10)
+
+        # 페이지네이션
+        paginator = Paginator(theme_result_list, 10)  # 10개씩 페이지 나누기
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+
         context = {'page_obj': page_obj}
         return render(request, 'stock/theme_stocks.html', context)
 
 
 def theme_detail(request, theme):
-    krx_stocks = get_krx_listing()
+    krx_stocks = fdr.StockListing('KRX')
+
+    # Theme를 fdr에 merge
+    # 파일 경로 설정
     theme_file_path = os.path.join(settings.BASE_DIR, 'static', 'data', 'theme.xlsx')
+
+    # 엑셀 파일 읽기
     theme_df = pd.read_excel(theme_file_path)
+
+    # 'Code' 컬럼을 기준으로 두 DataFrame 병합
     krx_stocks = krx_stocks.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
     theme_stocks = krx_stocks[krx_stocks['Theme'] == theme].sort_values('ChagesRatio', ascending=False)
+
+    # DataFrame을 딕셔너리 리스트로 변환
     theme_stocks_list = theme_stocks.to_dict('records')
-    paginator = Paginator(theme_stocks_list, 10)
+
+    # 페이지네이션
+    paginator = Paginator(theme_stocks_list, 10)  # 10개씩 페이지 나누기
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
     context = {'theme': theme, 'page_obj': page_obj}
     return render(request, 'stock/theme_detail.html', context)

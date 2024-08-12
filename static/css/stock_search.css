@@ -54,3 +54,8 @@ body {
 #searchResults::-webkit-scrollbar-thumb:hover {
     background-color: #6B7280;
 }
+
+.bar-chart {
+    height: 20px;
+    display: inline-block;
+}

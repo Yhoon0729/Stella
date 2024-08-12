@@ -12,14 +12,16 @@
     {% include 'layouts/header.html' %}
 
     <main class="flex-grow container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6 gradient-text">테마별 주식</h1>
-        
+        <h1 class="text-3xl font-bold mb-6 gradient-text">산업별 주식</h1>
+
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
             <table class="w-full">
                 <thead>
                     <tr>
-                        <th class="text-left">테마</th>
-                        <th class="text-right">평균 등락률</th>
+                        <th class="text-left">산업</th>
+                        <th class="text-left">대표 종목</th>
+                        <th class="text-right">대표 종목 등락률</th>
+                        <th class="text-right">산업 평균 등락률</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,20 +36,37 @@
                                 <span>테마 정보 없음</span>
                             {% endif %}
                         </td>
-                        <td class="text-right {% if theme.ChagesRatio > 0 %}text-red-500{% else %}text-green-500{% endif %}">
-                            {{ theme.ChagesRatio|floatformat:2 }}%
+                        <td>
+                            <a href="{% url 'info' theme.Code %}" class="text-blue-400 hover:underline">
+                                {{ theme.Name }}
+                            </a>
+                        </td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end">
+                                <span class="mr-2 {% if theme.ChagesRatio_leader > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+                                    {{ theme.ChagesRatio_leader|floatformat:2 }}%
+                                </span>
+                                <div class="bar-chart {% if theme.ChagesRatio_leader > 0 %}bg-red-500{% else %}bg-green-500{% endif %}"
+                                     data-ratio="{{ theme.ChagesRatio_leader }}">
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-right {% if theme.ChagesRatio_avg > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+                            {{ theme.ChagesRatio_avg|floatformat:2 }}%
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        
+
         <div class="mt-6">
             {% include 'stock/pagination.html' with page_obj=page_obj %}
         </div>
     </main>
 
     {% include 'layouts/footer.html' %}
+
+    <script src="{% static 'js/theme_stocks.js' %}"></script>
 </body>
 </html>
