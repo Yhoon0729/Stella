@@ -1,25 +1,38 @@
-import requests
-from bs4 import BeautifulSoup
+import os
 
-def get_stock_industry(stock_code):
-    url = f"https://finance.naver.com/item/main.nhn?code={stock_code}"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    
-    # 산업 정보를 포함하는 테이블을 찾습니다
-    table = soup.select_one('table.table_dot_h')
-    
-    if table:
-        # 테이블의 모든 행을 순회합니다
-        for row in table.select('tr'):
-            th = row.select_one('th')
-            td = row.select_one('td')
-            if th and td and '산업' in th.text:
-                return td.text.strip()
-    
-    return "정보 없음"
+import pandas as pd
+from django.conf import settings
+from django.core.paginator import Paginator
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+import FinanceDataReader as fdr
+from datetime import datetime, timedelta
 
-# 사용 예
-stock_code = '005930'  # 삼성전자
-industry = get_stock_industry(stock_code)
-print(f"종목코드 {stock_code}의 산업: {industry}")
+from comments.views import get_comments
+
+def theme_stocks(request):
+    if request.method != 'POST':
+        krx_stocks = fdr.StockListing('KRX')
+
+        # Theme를 fdr에 merge
+        theme_df = pd.read_excel('test/theme.xlsx')
+
+        krx_stocks = krx_stocks.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
+
+        # NaN 값을 가진 행 제거
+        krx_stocks = krx_stocks.dropna(subset=['Theme'])
+
+        # 테마별 평균 등락률 계산
+        theme_avg_change = krx_stocks.groupby('Theme')['ChagesRatio'].mean().reset_index()
+        theme_avg_change = theme_avg_change.sort_values('ChagesRatio', ascending=False)
+
+        # DataFrame을 딕셔너리 리스트로 변환
+        theme_avg_change_list = theme_avg_change.to_dict('records')
+
+        # 페이지네이션
+        paginator = Paginator(theme_avg_change_list, 10)  # 10개씩 페이지 나누기
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        context = {'page_obj': page_obj}
+        return render(request, 'stock/theme_stocks.html', context)

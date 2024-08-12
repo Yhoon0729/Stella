@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테마별 주식 - Stella</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/stock_search.css' %}">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+    {% include 'layouts/header.html' %}
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 gradient-text">테마별 주식</h1>
+        
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">테마</th>
+                        <th class="text-right">평균 등락률</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for theme in page_obj %}
+                    <tr>
+                        <td>
+                            {% if theme.Theme %}
+                                <a href="{% url 'theme_detail' theme.Theme %}" class="text-blue-400 hover:underline">
+                                    {{ theme.Theme }}
+                                </a>
+                            {% else %}
+                                <span>테마 정보 없음</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right {% if theme.ChagesRatio > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+                            {{ theme.ChagesRatio|floatformat:2 }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-6">
+            {% include 'stock/pagination.html' with page_obj=page_obj %}
+        </div>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+</body>
+</html>

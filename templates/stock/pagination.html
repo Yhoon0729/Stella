@@ -1,0 +1,19 @@
+<div class="flex justify-center">
+    <nav class="inline-flex rounded-md shadow">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-l-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50">
+                이전
+            </a>
+        {% endif %}
+
+        <span class="px-3 py-2 text-sm font-medium text-gray-700 bg-white">
+            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-r-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50">
+                다음
+            </a>
+        {% endif %}
+    </nav>
+</div>

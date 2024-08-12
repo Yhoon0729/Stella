@@ -8,5 +8,7 @@ urlpatterns = [
     path("search_page/", views.search_page, name='search_page'),
     path("search_stocks/", views.search_stocks, name='search_stocks'),
     path('redirect/', views.stock_redirect, name='stock_redirect'),
+    path('theme_stocks/', views.theme_stocks, name='theme_stocks'),
+    path('theme_detail/<str:theme>/', views.theme_detail, name='theme_detail'),
 
 ]

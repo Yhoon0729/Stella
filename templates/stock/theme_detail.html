@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ theme }} 테마 주식 - Stella</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/stock_search.css' %}">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+    {% include 'layouts/header.html' %}
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 gradient-text">{{ theme }} 테마 주식</h1>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">종목명</th>
+                        <th class="text-right">현재가</th>
+                        <th class="text-right">등락률</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in page_obj %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'info' stock.Code %}" class="text-blue-400 hover:underline">
+                                {{ stock.Name }}
+                            </a>
+                        </td>
+                        <td class="text-right">{{ stock.Close|floatformat:0 }}원</td>
+                        <td class="text-right {% if stock.ChagesRatio > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+                            {{ stock.ChagesRatio|floatformat:2 }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6">
+            {% include 'stock/pagination.html' with page_obj=page_obj %}
+        </div>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+</body>
+</html>
