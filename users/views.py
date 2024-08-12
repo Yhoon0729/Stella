@@ -51,6 +51,9 @@ def signup(request) :
             return render(request, "alert.html", context)
 
 def signin(request) :
+    if 'user_id' in request.session:
+        return redirect('index')
+
     if request.method != 'POST' :
         return render(request, "users/signin.html")
     else :
@@ -176,6 +179,33 @@ def userdelete(request) :
 
             context = {"msg" : f"{user_name}님의 탈퇴가 완료되었습니다.", "url":"/users/signin"}
             return render(request, 'alert.html', context)
+
+def finduserid(request) :
+    if 'user_id' in request.session:
+        return redirect('index')
+
+    if request.method != 'POST' :
+        return render(request, "users/finduserid.html")
+    else :
+        user_name = request.POST.get('user_name')
+        user_email = request.POST.get('user_email')
+
+    if not user_name or not user_email:
+        context = {"msg": "아이디와 이메일을 모두 입력해주세요.", "url": "/users/finduserid"}
+        return render(request, 'alert.html', context)
+
+    try:
+        user = User.objects.get(user_name=user_name, user_email=user_email)
+    except User.DoesNotExist:
+        context = {"msg": "입력한 정보와 일치하는 사용자가 없습니다.", "url": "/users/finduserid"}
+        return render(request, 'alert.html', context)
+    else :
+        context = {
+            "user_id" : user.user_id,
+        }
+        return render(request, 'users/showuserid.html', context)
+
+
 
 def generate_verification_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))

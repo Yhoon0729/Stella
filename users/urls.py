@@ -28,6 +28,7 @@ urlpatterns = [
     path("userupdate/", views.userupdate, name="userupdate"),
     path("passupdate/", views.passupdate, name="passupdate"),
     path("userdelete/", views.userdelete, name="userdelete"),
+    path("finduserid/", views.finduserid, name="finduserid"),
     path("findpassword/", views.findpassword, name="findpassword"),
     path("verify_code/", views.verify_code, name="verify_code"),
     path("resetpassword/", views.resetpassword, name="resetpassword"),
