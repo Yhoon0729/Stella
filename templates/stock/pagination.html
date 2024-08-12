@@ -1,28 +1,17 @@
-<div class="flex justify-center">
-    <nav class="inline-flex rounded-md shadow">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-l-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50">
-                이전
-            </a>
-        {% endif %}
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1" class="pagination-link">&laquo; 처음</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">이전</a>
+    {% endif %}
 
-        {% with ''|center:5 as range %}
-        {% for _ in range %}
-            {% with forloop.counter0|add:page_obj.number|add:-2 as page_number %}
-                {% if page_number > 0 and page_number <= page_obj.paginator.num_pages %}
-                    <a href="?page={{ page_number }}"
-                       class="px-3 py-2 text-sm font-medium {% if page_number == page_obj.number %}text-blue-600 bg-blue-100{% else %}text-gray-500 bg-white hover:bg-gray-50{% endif %}">
-                        {{ page_number }}
-                    </a>
-                {% endif %}
-            {% endwith %}
-        {% endfor %}
-        {% endwith %}
+    <span class="current">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-r-md text-sm font-medium text-gray-500 bg-white hover:bg-gray-50">
-                다음
-            </a>
-        {% endif %}
-    </nav>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">다음</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">마지막 &raquo;</a>
+    {% endif %}
 </div>
+{% endif %}

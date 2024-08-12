@@ -47,10 +47,54 @@ def index(request):
         }
         top_3_stocks.append(stock_data)
 
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=1)
+
+    # KOSPI와 KOSDAQ 지수 최신 데이터 가져오기
+    latest_kospi_data = fdr.DataReader('KS11', start_date, end_date)
+    latest_kosdaq_data = fdr.DataReader('KQ11', start_date, end_date)
+
+    kospi_data = {
+        'current': latest_kospi_data.iloc[-1]['Close'],
+        'comp': latest_kospi_data.iloc[-1]['Comp'],
+        'change': (latest_kospi_data.iloc[-1]['Change']) * 100
+    }
+
+    kosdaq_data = {
+        'current': latest_kosdaq_data.iloc[-1]['Close'],
+        'comp': latest_kosdaq_data.iloc[-1]['Comp'],
+        'change': (latest_kosdaq_data.iloc[-1]['Change']) * 100
+    }
+
     context = {
         'top_3_stocks' : top_3_stocks,
+        'kospi': kospi_data,
+        'kosdaq': kosdaq_data
     }
     return render(request, 'index.html', context)
+
+def market_list(request, market):
+    # 캐시된 KRX 리스팅 가져오기
+    krx_stocks = get_krx_listing()
+
+    if market == 'KOSPI':
+        stocks = krx_stocks[krx_stocks['Market'] == 'KOSPI']
+    elif market == 'KOSDAQ':
+        stocks = krx_stocks[krx_stocks['Market'] == 'KOSDAQ']
+    else:
+        stocks = []  # 잘못된 시장 이름이 주어진 경우
+
+    # 페이지네이션
+    paginator = Paginator(stocks.to_dict('records'), 20)  # 한 페이지에 20개 종목
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'market': market,
+        'page_obj': page_obj
+    }
+
+    return render(request, 'stock/market_list.html', context)
 
 
 def stock_info(request, stock_code):

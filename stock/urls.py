@@ -10,4 +10,5 @@ urlpatterns = [
     path('redirect/', views.stock_redirect, name='stock_redirect'),
     path('theme_stocks/', views.theme_stocks, name='theme_stocks'),
     path('theme_detail/<str:theme>/', views.theme_detail, name='theme_detail'),
+    path('market/<str:market>/', views.market_list, name='market_list'),
 ]

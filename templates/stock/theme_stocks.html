@@ -4,54 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>테마별 주식 - Stella</title>
+    <title>산업별 주식 - Stella</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/stock_search.css' %}">
+    <link href="{% static 'css/market_list.css' %}" rel="stylesheet">
+    <style>
+        .bar-chart {
+            height: 10px;
+            width: 50px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gray-900 text-white">
     {% include 'layouts/header.html' %}
 
     <main class="flex-grow container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6 gradient-text">산업별 주식</h1>
-
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-            <table class="w-full">
+        <div class="market-header text-center">
+            <h2 class="market-title">산업별 주식</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="stock-table">
                 <thead>
                     <tr>
-                        <th class="text-left">산업</th>
-                        <th class="text-left">대표 종목</th>
-                        <th class="text-right">대표 종목 등락률</th>
-                        <th class="text-right">산업 평균 등락률</th>
+                        <th>산업</th>
+                        <th>대표 종목</th>
+                        <th>대표 종목 등락률</th>
+                        <th>산업 평균 등락률</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for theme in page_obj %}
                     <tr>
-                        <td>
+                        <td class="stock-name">
                             {% if theme.Theme %}
-                                <a href="{% url 'theme_detail' theme.Theme %}" class="text-blue-400 hover:underline">
-                                    {{ theme.Theme }}
-                                </a>
+                                <a href="{% url 'theme_detail' theme.Theme %}">{{ theme.Theme }}</a>
                             {% else %}
                                 <span>테마 정보 없음</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <a href="{% url 'info' theme.Code %}" class="text-blue-400 hover:underline">
-                                {{ theme.Name }}
-                            </a>
+                        <td class="stock-name">
+                            <a href="{% url 'info' theme.Code %}">{{ theme.Name }}</a>
                         </td>
-                        <td class="text-right">
+                        <td class="stock-change">
                             <div class="flex items-center justify-end">
-                                <span class="mr-2 {% if theme.ChagesRatio_leader > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+                                <span class="mr-2 {% if theme.ChagesRatio_leader > 0 %}text-red-400{% else %}text-green-400{% endif %}">
                                     {{ theme.ChagesRatio_leader|floatformat:2 }}%
                                 </span>
-                                <div class="bar-chart {% if theme.ChagesRatio_leader > 0 %}bg-red-500{% else %}bg-green-500{% endif %}"
+                                <div class="bar-chart {% if theme.ChagesRatio_leader > 0 %}bg-red-400{% else %}bg-green-400{% endif %}"
                                      data-ratio="{{ theme.ChagesRatio_leader }}">
                                 </div>
                             </div>
                         </td>
-                        <td class="text-right {% if theme.ChagesRatio_avg > 0 %}text-red-500{% else %}text-green-500{% endif %}">
+                        <td class="stock-change {% if theme.ChagesRatio_avg > 0 %}text-red-400{% else %}text-green-400{% endif %}">
                             {{ theme.ChagesRatio_avg|floatformat:2 }}%
                         </td>
                     </tr>
@@ -59,7 +64,6 @@
                 </tbody>
             </table>
         </div>
-
         <div class="mt-6">
             {% include 'stock/pagination.html' with page_obj=page_obj %}
         </div>
