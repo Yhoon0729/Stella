@@ -123,6 +123,7 @@ def stock_info(request, stock_code):
         stock_data = {
             'code': stock_code,
             'name': stock_info['Name'].values[0],
+            'market' : stock_info['Market'].values[0],
             'theme': stock_info['Theme'].values[0],
             'price': stock_info['Close'].values[0],
             'change': stock_info['Changes'].values[0],
