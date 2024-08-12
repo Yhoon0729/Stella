@@ -25,7 +25,7 @@ def cached_data_reader(code, start_date, end_date):
         return pd.read_json(cached_data)
 
     data = fdr.DataReader(code, start_date, end_date)
-    cache.set(cache_key, data.to_json(), timeout=60)  # 1시간 동안 캐시
+    cache.set(cache_key, data.to_json(), timeout=60)  # 1분 동안 캐시
     return data
 
 def index(request):
