@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ stock.name }} ({{ stock.code }}) - 주식 정보</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/stock_info.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+    {% include 'layouts/header.html' %}
+
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 gradient-text">{{ stock.name }} ({{ stock.code }})</h1>
+        
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-xl">현재가: <span class="font-bold">{{ stock.price }}원</span></p>
+                    <p class="{% if stock.change > 0 %}text-red-400{% else %}text-green-400{% endif %}">
+                        등락: {{ stock.change }}원 ({{ stock.change_percent }}%)
+                    </p>
+                </div>
+                <div>
+                    <p>거래량: {{ stock.volume }}</p>
+                    <p>시가총액: {{ stock.market_cap }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="stockChart" class="w-full h-64 mb-8"></div>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-bold mb-4">댓글</h2>
+            {% if user_id %}
+                <form method="post" action="{% url 'comments:add' stock.code %}">
+                    {% csrf_token %}
+                    <textarea name="content" class="w-full p-2 rounded bg-gray-700 text-white" rows="3" required></textarea>
+                    <button type="submit" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">댓글 작성</button>
+                </form>
+            {% else %}
+                <p>댓글을 작성하려면 <a href="{% url 'signin' %}" class="text-blue-400 hover:underline">로그인</a>이 필요합니다.</p>
+            {% endif %}
+        
+            <div class="mt-4 space-y-4">
+                {% for comment in comments %}
+                    <div class="bg-gray-700 p-4 rounded">
+                        <p class="font-bold">{{ comment.user_id }}</p>
+                        <p>{{ comment.content }}</p>
+                        <p class="text-sm text-gray-400">{{ comment.created_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                {% empty %}
+                    <p>아직 댓글이 없습니다.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/stock_chart.js' %}"></script>
+    <script>
+        const stockCode = "{{ stock.code }}";
+    </script>
+</body>
+</html>

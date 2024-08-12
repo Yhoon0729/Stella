@@ -23,11 +23,14 @@
                 <h3 class="text-2xl font-bold mb-4">실시간 Hot 종목</h3>
                 <ul class="space-y-2">
                     {% for s in top_3_stocks %}
-                    <li class="flex justify-between items-center">
-                        <span>{{ s.name }}</span>
-                        <span class="{% if stock.chagesRatio > 0 %}text-green-400{% else %}text-red-400{% endif %}">
-                            {{ s.chagesRatio|floatformat:2 }}%
-                        </span>
+                    <li class="flex justify-between items-center py-2 border-b border-gray-700">
+                        <a href="{% url 'info' s.code %}" class="font-semibold hover:text-blue-400 transition">{{ s.name }}</a>
+                        <div class="text-right">
+                            <div>{{ s.close|floatformat:0 }}원</div>
+                            <div class="{% if s.chagesRatio > 0 %}text-red-400{% else %}text-green-400{% endif %} text-sm">
+                                {{ s.chagesRatio|floatformat:2 }}% ({{ s.change|floatformat:0 }})
+                            </div>
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
