@@ -24,8 +24,8 @@
                 </div>
                 <div>
                     <p>거래량: {{ stock.volume }}</p>
-                    <p>시가총액: {{ stock.market_cap }}</p>
-                    <p>산업: 
+                    <p>시가총액: {{ stock.marcap }}</p>
+                    <p>산업:
                         {% if stock.theme %}
                             <a href="{% url 'theme_detail' stock.theme %}" class="text-blue-400 hover:underline">
                                 {{ stock.theme }}

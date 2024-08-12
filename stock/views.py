@@ -70,6 +70,12 @@ def stock_info(request, stock_code):
             'volume': 'N/A',
         }
     else:
+        marcap = stock_info['Marcap'].values[0]
+        marcap_in_won = marcap / 1e8  # 시가총액을 억 단위로 변환
+
+        volume = stock_info['Volume'].values[0]
+        formatted_volume = f"{volume:,}"  # 천 단위 구분 기호 포함
+
         stock_data = {
             'code': stock_code,
             'name': stock_info['Name'].values[0],
@@ -77,7 +83,8 @@ def stock_info(request, stock_code):
             'price': stock_info['Close'].values[0],
             'change': stock_info['Changes'].values[0],
             'change_percent': stock_info['ChagesRatio'].values[0],
-            'volume': stock_info['Volume'].values[0],
+            'volume': formatted_volume,
+            'marcap': f"{marcap_in_won:,.0f}억",
         }
 
     comments = get_comments(stock_code)
