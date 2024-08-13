@@ -10,10 +10,14 @@
     <link href="{% static 'css/market_list.css' %}" rel="stylesheet">
     <style>
         .bar-chart {
-            height: 10px;
-            width: 50px;
+            height: 20px;
+            width: 100px;
             display: inline-block;
             vertical-align: middle;
+        }
+        .bar {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -25,7 +29,7 @@
             <h2 class="market-title">산업별 주식</h2>
         </div>
         <div class="overflow-x-auto">
-            <table class="stock-table">
+            <table class="stock-table w-full">
                 <thead>
                     <tr>
                         <th>산업</th>
@@ -48,13 +52,14 @@
                             <a href="{% url 'info' theme.Code %}">{{ theme.Name }}</a>
                         </td>
                         <td class="stock-change">
-                            <div class="flex items-center justify-end">
-                                <span class="mr-2 {% if theme.ChagesRatio_leader > 0 %}text-red-400{% else %}text-green-400{% endif %}">
+                            <div class="flex items-center">
+                                <div class="bar-chart mr-2">
+                                    <div class="bar {% if theme.ChagesRatio_leader > 0 %}bg-red-400{% else %}bg-green-400{% endif %}"
+                                         style="width: 0%;" data-ratio="{{ theme.ChagesRatio_leader }}"></div>
+                                </div>
+                                <span class="{% if theme.ChagesRatio_leader > 0 %}text-red-400{% else %}text-green-400{% endif %}">
                                     {{ theme.ChagesRatio_leader|floatformat:2 }}%
                                 </span>
-                                <div class="bar-chart {% if theme.ChagesRatio_leader > 0 %}bg-red-400{% else %}bg-green-400{% endif %}"
-                                     data-ratio="{{ theme.ChagesRatio_leader }}">
-                                </div>
                             </div>
                         </td>
                         <td class="stock-change {% if theme.ChagesRatio_avg > 0 %}text-red-400{% else %}text-green-400{% endif %}">
@@ -70,13 +75,13 @@
                 <li class="{% if startpage <= bottomLine %}opacity-50 cursor-not-allowed{% endif %}">
                     <a class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 {% if startpage <= bottomLine %}pointer-events-none{% endif %}" href="?page={{ startpage|prepage:bottomLine }}">Previous</a>
                 </li>
-        
+
                 {% for p in pagelist %}
                 <li>
                     <a class="px-3 py-2 {% if pageNum == p %}bg-blue-600 text-white{% else %}bg-blue-500 text-white hover:bg-blue-600{% endif %} rounded" href="?page={{ p }}">{{ p }}</a>
                 </li>
                 {% endfor %}
-        
+
                 <li class="{% if endpage >= maxpage %}opacity-50 cursor-not-allowed{% endif %}">
                     <a class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 {% if endpage >= maxpage %}pointer-events-none{% endif %}" href="?page={{ startpage|nextpage:bottomLine }}">Next</a>
                 </li>
@@ -85,7 +90,19 @@
     </main>
 
     {% include 'layouts/footer.html' %}
-
+    
+    {% comment %}밑에 안되는 이유 찾기{% endcomment %}
     <script src="{% static 'js/theme_stocks.js' %}"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const bars = document.querySelectorAll('.bar');
+        bars.forEach(bar => {
+            const ratio = parseFloat(bar.getAttribute('data-ratio'));
+            const width = Math.abs(ratio) * 5; // 5를 곱해 그래프를 더 크게 표시
+            bar.style.width = `${Math.min(width, 100)}%`; // 최대 100%를 넘지 않도록
+        });
+    });
+    </script>
 </body>
 </html>

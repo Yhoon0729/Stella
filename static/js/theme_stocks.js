@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const bars = document.querySelectorAll('.bar-chart');
+    const bars = document.querySelectorAll('.bar');
     bars.forEach(bar => {
-        const ratio = parseFloat(bar.dataset.ratio);
-        const width = Math.abs(ratio) * 10; // 10을 곱해 더 큰 막대를 만듭니다
-        bar.style.width = `${width}px`;
+        const ratio = parseFloat(bar.getAttribute('data-ratio'));
+        const width = Math.abs(ratio) * 5; // 5를 곱해 그래프를 더 크게 표시
+        bar.style.width = `${Math.min(width, 100)}%`; // 최대 100%를 넘지 않도록
     });
 });
