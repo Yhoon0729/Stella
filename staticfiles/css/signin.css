@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#signin-form input[type="text"],
+#signin-form input[type="password"] {
+    transition: all 0.3s ease;
+}
+
+#signin-form input[type="text"]:focus,
+#signin-form input[type="password"]:focus {
+    transform: scale(1.02);
+}
+
+#remember_me {
+    accent-color: #3B82F6;
+}

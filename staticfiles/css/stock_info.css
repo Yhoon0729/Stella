@@ -1,0 +1,13 @@
+.gradient-text {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-gray-800 {
+    background-color: #1F2937;
+}
+
+.bg-gray-700 {
+    background-color: #374151;
+}

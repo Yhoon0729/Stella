@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#findUserIdForm input[type="text"],
+#findUserIdForm input[type="email"] {
+    transition: all 0.3s ease;
+}
+
+#findUserIdForm input[type="text"]:focus,
+#findUserIdForm input[type="email"]:focus {
+    transform: scale(1.02);
+}
+
+.result-message {
+    transition: all 0.3s ease;
+}
+
+.success {
+    background-color: rgba(6, 95, 70, 0.1);
+    border: 1px solid #065f46;
+    color: #d1fae5;
+}
+
+.error {
+    background-color: rgba(127, 29, 29, 0.1);
+    border: 1px solid #7f1d1d;
+    color: #fecaca;
+}
+
+button[type="submit"] {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

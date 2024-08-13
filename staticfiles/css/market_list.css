@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #1a202c;
+    color: #e2e8f0;
+}
+
+.market-header {
+    background: linear-gradient(45deg, #4a5568, #2d3748);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.market-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #f7fafc;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stock-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stock-table th {
+    background-color: #2d3748;
+    color: #f7fafc;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 1rem;
+    text-align: left;
+}
+
+.stock-table td {
+    background-color: #2d3748;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #4a5568;
+}
+
+.stock-table tr:hover td {
+    background-color: #4a5568;
+    transition: background-color 0.3s ease;
+}
+
+.stock-code {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+}
+
+.stock-name a {
+    color: #63b3ed;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.stock-name a:hover {
+    color: #4299e1;
+}
+
+.stock-price {
+    font-weight: 700;
+}
+
+.stock-change-positive {
+    color: #48bb78;
+}
+
+.stock-change-negative {
+    color: #f56565;
+}
+
+.pagination {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.pagination a {
+    color: #63b3ed;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #2d3748;
+}
+
+.pagination .current {
+    font-weight: 700;
+    color: #f7fafc;
+}
+

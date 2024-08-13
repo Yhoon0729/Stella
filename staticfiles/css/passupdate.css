@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #111827;
+    color: #E5E7EB;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #FFA07A, #FF6347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+input[type="password"] {
+    transition: all 0.3s ease;
+}
+
+input[type="password"]:focus {
+    transform: scale(1.02);
+}
+
+.transition {
+    transition: all 0.3s ease;
+}
+
+.hover\:bg-blue-600:hover {
+    background-color: #2563EB;
+}
