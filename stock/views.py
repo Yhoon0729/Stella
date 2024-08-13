@@ -256,15 +256,37 @@ def theme_detail(request, theme):
     theme_df = pd.read_excel(theme_file_path)
 
     # 'Code' 열을 문자열로 변환
-    # theme.xlsx에 새로 상장된 주식을 넣으면 datatype이 달라져서
     krx_stocks['Code'] = krx_stocks['Code'].astype(str)
     theme_df['Code'] = theme_df['Code'].astype(str)
 
     krx_stocks = krx_stocks.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
     theme_stocks = krx_stocks[krx_stocks['Theme'] == theme].sort_values('ChagesRatio', ascending=False)
     theme_stocks_list = theme_stocks.to_dict('records')
-    paginator = Paginator(theme_stocks_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {'theme': theme, 'page_obj': page_obj}
+
+    # 페이지네이션
+    paginator = Paginator(theme_stocks_list, 10)  # 한 페이지에 10개 항목
+    pageNum = request.GET.get('page', '1')
+    page_obj = paginator.get_page(pageNum)
+
+    # 페이지네이션 관련 변수 계산
+    totalcount = len(theme_stocks_list)
+    bottomLine = 5  # 한 페이지 그룹에 표시할 페이지 수
+    currentPage = int(pageNum)
+    startpage = (currentPage - 1) // bottomLine * bottomLine + 1
+    endpage = startpage + bottomLine - 1
+    maxpage = paginator.num_pages
+    pagelist = range(startpage, min(endpage, maxpage) + 1)
+
+    context = {
+        'theme': theme,
+        'page_obj': page_obj,
+        'totalcount': totalcount,
+        'pageNum': currentPage,
+        'startpage': startpage,
+        'endpage': endpage,
+        'bottomLine': bottomLine,
+        'maxpage': maxpage,
+        'pagelist': pagelist,
+    }
+
     return render(request, 'stock/theme_detail.html', context)
