@@ -48,7 +48,7 @@ def index(request):
         top_3_stocks.append(stock_data)
 
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=7)
+    start_date = end_date - timedelta(days=3)
 
     # KOSPI와 KOSDAQ 지수 최신 데이터 가져오기
     latest_kospi_data = fdr.DataReader('KS11', start_date, end_date)
@@ -160,7 +160,10 @@ def search_stocks(request):
     if query:
         try:
             all_stocks = get_krx_listing()
-            results = all_stocks[all_stocks['Code'].str.startswith(query)]
+            results = all_stocks[
+                (all_stocks['Code'].str.startswith(query)) |
+                (all_stocks['Name'].str.contains(query, case=False, na=False))
+            ]
             stocks = [{'code': row['Code'], 'name': row['Name']}
                       for _, row in results.head(5).iterrows()]
             return JsonResponse({'stocks': stocks})

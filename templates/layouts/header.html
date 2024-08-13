@@ -1,17 +1,37 @@
 {% load static %}
 <header class="bg-gray-900 p-4">
-    <nav class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold gradient-text"><a href="{% url 'index' %}">Stella</a></h1>
+    <nav class="container mx-auto flex flex-col items-center">
+        <div class="w-full flex justify-between items-center mb-2">
+            <h1 class="text-2xl font-bold gradient-text"><a href="{% url 'index' %}">Stella</a></h1>
+            <ul class="flex space-x-4">
+                {% if request.session.user_id %}
+                    <li><a href="{% url 'userinfo' %}" class="hover:text-blue-400 transition">내 정보</a></li>
+                    <li><a href="{% url 'signout' %}" class="hover:text-blue-400 transition">로그아웃</a></li>
+                {% else %}
+                    <li><a href="{% url 'signin' %}" class="hover:text-blue-400 transition">로그인</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="w-full flex justify-center mb-2">
+            <form action="{% url 'stock_redirect' %}" method="get" id="stockSearchForm" class="flex w-64">
+                <input type="text" name="query" id="stock-search"
+                       placeholder="종목 검색" autocomplete="off"
+                       class="w-full p-1 rounded-l-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded-r-md transition duration-300 text-sm">
+                    검색
+                </button>
+            </form>
+        </div>
+
         <ul class="flex space-x-4">
             <li><a href="{% url 'index' %}" class="hover:text-blue-400 transition">홈</a></li>
             <li><a href="{% url 'search_page' %}" class="hover:text-blue-400 transition">종목 검색</a></li>
             <li><a href="{% url 'theme_stocks' %}" class="hover:text-blue-400 transition">산업별 주가</a></li>
-            {% if request.session.user_id %}
-                <li><a href="{% url 'userinfo' %}" class="hover:text-blue-400 transition">내 정보</a></li>
-                <li><a href="{% url 'signout' %}" class="hover:text-blue-400 transition">로그아웃</a></li>
-            {% else %}
-                <li><a href="{% url 'signin' %}" class="hover:text-blue-400 transition">로그인</a></li>
-            {% endif %}
         </ul>
     </nav>
+    <div id="search-results" class="absolute bg-gray-800 mt-1 w-64 rounded-md shadow-lg z-10 left-1/2 transform -translate-x-1/2 max-h-60 overflow-y-auto"></div>
 </header>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/stock_search.js' %}"></script>
