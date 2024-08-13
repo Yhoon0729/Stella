@@ -86,12 +86,28 @@ def market_list(request, market):
 
     # 페이지네이션
     paginator = Paginator(stocks.to_dict('records'), 20)  # 한 페이지에 20개 종목
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    pageNum = request.GET.get('page', '1')
+    page_obj = paginator.get_page(pageNum)
+
+    # 페이지네이션 관련 변수 계산
+    totalcount = len(stocks)
+    bottomLine = 5  # 한 페이지 그룹에 표시할 페이지 수
+    currentPage = int(pageNum)
+    startpage = (currentPage - 1) // bottomLine * bottomLine + 1
+    endpage = startpage + bottomLine - 1
+    maxpage = paginator.num_pages
+    pagelist = range(startpage, min(endpage, maxpage) + 1)
 
     context = {
         'market': market,
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'totalcount': totalcount,
+        'pageNum': currentPage,
+        'startpage': startpage,
+        'endpage': endpage,
+        'bottomLine': bottomLine,
+        'maxpage': maxpage,
+        'pagelist': pagelist,
     }
 
     return render(request, 'stock/market_list.html', context)
@@ -193,7 +209,6 @@ def theme_stocks(request):
         theme_df = pd.read_excel('test/theme.xlsx')
 
         # 'Code' 열을 문자열로 변환
-        # theme.xlsx에 새로 상장된 주식을 넣으면 datatype이 달라져서
         krx_stocks['Code'] = krx_stocks['Code'].astype(str)
         theme_df['Code'] = theme_df['Code'].astype(str)
 
@@ -206,10 +221,32 @@ def theme_stocks(request):
                                               suffixes=('_avg', '_leader'))
         theme_result = theme_result.sort_values('ChagesRatio_avg', ascending=False)
         theme_result_list = theme_result.to_dict('records')
-        paginator = Paginator(theme_result_list, 10)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        context = {'page_obj': page_obj}
+
+        # 페이지네이션
+        paginator = Paginator(theme_result_list, 10)  # 한 페이지에 10개 항목
+        pageNum = request.GET.get('page', '1')
+        page_obj = paginator.get_page(pageNum)
+
+        # 페이지네이션 관련 변수 계산
+        totalcount = len(theme_result_list)
+        bottomLine = 5  # 한 페이지 그룹에 표시할 페이지 수
+        currentPage = int(pageNum)
+        startpage = (currentPage - 1) // bottomLine * bottomLine + 1
+        endpage = startpage + bottomLine - 1
+        maxpage = paginator.num_pages
+        pagelist = range(startpage, min(endpage, maxpage) + 1)
+
+        context = {
+            'page_obj': page_obj,
+            'totalcount': totalcount,
+            'pageNum': currentPage,
+            'startpage': startpage,
+            'endpage': endpage,
+            'bottomLine': bottomLine,
+            'maxpage': maxpage,
+            'pagelist': pagelist,
+        }
+
         return render(request, 'stock/theme_stocks.html', context)
 
 

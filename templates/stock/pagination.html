@@ -1,17 +1,35 @@
-{% if page_obj.has_other_pages %}
-<div class="pagination">
-    {% if page_obj.has_previous %}
-        <a href="?page=1" class="pagination-link">&laquo; 처음</a>
-        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">이전</a>
+{% comment %}
+{% load custom_template_filters %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pagination flex items-center justify-center space-x-2 my-4">
+    {% with page_group=page_obj.number|subtract:1|divisibleby:10 %}
+    {% with group_start=page_group|multiply:10|add:1 %}
+    {% with group_end=group_start|add:9 %}
+
+    {% if group_start > 1 %}
+        <a href="?page=1" class="pagination-link px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">&laquo; 처음</a>
+        <a href="?page={{ group_start|subtract:1 }}" class="pagination-link px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">이전</a>
     {% endif %}
 
-    <span class="current">
-        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-    </span>
+    {% for page_num in group_start|range:group_end|add:1 %}
+        {% if page_num <= page_obj.paginator.num_pages %}
+            {% if page_num == page_obj.number %}
+                <span class="current px-3 py-2 bg-gray-300 text-gray-700 rounded">{{ page_num }}</span>
+            {% else %}
+                <a href="?page={{ page_num }}" class="pagination-link px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">{{ page_num }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">다음</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">마지막 &raquo;</a>
+    {% if group_end < page_obj.paginator.num_pages %}
+        <a href="?page={{ group_end|add:1 }}" class="pagination-link px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">다음</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">마지막 &raquo;</a>
     {% endif %}
+
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
 </div>
 {% endif %}
+{% endcomment %}
