@@ -78,7 +78,7 @@ def signout(request) :
         return redirect('index')
 
     auth.logout(request)
-    context = {"msg" : "ㅂㅇㅂㅇ", "url" : "/users/signin"}
+    context = {"msg" : "로그아웃 되었습니다.", "url" : "/users/signin"}
     return render(request, "alert.html", context)
 
 def userinfo(request) :
