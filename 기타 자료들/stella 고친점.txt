@@ -1,7 +1,6 @@
 stella 고친점
 
 Django는 세션게 객체를 직접 저장 x
-세션 데이터는 JSON으로 직렬화되어 저장되는데, User 객체는 기본적으로 JSON 직렬화가 불가능하기 때문
 
 
 Paginator 객체는 리스트나 쿼리셋을 예상하는데, DataFrame을 직접 넘겨주고 있어서 문제가 발생
@@ -14,3 +13,34 @@ Paginator 객체는 리스트나 쿼리셋을 예상하는데, DataFrame을 직�
         
         # 페이지네이션
         paginator = Paginator(theme_avg_change_list, 10)  # 10개씩 페이지 나누기
+
+
+
+
+
+
+IndexError at /
+single positional indexer is out-of-bounds
+Request Method:	GET
+Request URL:	http://127.0.0.1:8000/
+Django Version:	5.1
+Exception Type:	IndexError
+Exception Value:	
+single positional indexer is out-of-bounds
+Exception Location:	C:\Users\KITCOOP\Desktop\Nalong\toyPro\Stella\.venv\Lib\site-packages\pandas\core\indexing.py, line 1685, in _validate_integer
+Raised during:	stock.views.index
+Python Executable:	C:\Users\KITCOOP\Desktop\Nalong\toyPro\Stella\.venv\Scripts\python.exe
+Python Version:	3.12.3
+Python Path:	
+['C:\\Users\\KITCOOP\\Desktop\\Nalong\\toyPro\\Stella',
+ 'C:\\Users\\KITCOOP\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip',
+ 'C:\\Users\\KITCOOP\\AppData\\Local\\Programs\\Python\\Python312\\DLLs',
+ 'C:\\Users\\KITCOOP\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
+ 'C:\\Users\\KITCOOP\\AppData\\Local\\Programs\\Python\\Python312',
+ 'C:\\Users\\KITCOOP\\Desktop\\Nalong\\toyPro\\Stella\\.venv',
+ 'C:\\Users\\KITCOOP\\Desktop\\Nalong\\toyPro\\Stella\\.venv\\Lib\\site-packages']
+Server time:	Tue, 13 Aug 2024 08:35:16 +0900
+
+
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=7)  : days=1 에서 days=7로 고침

@@ -48,7 +48,7 @@ def index(request):
         top_3_stocks.append(stock_data)
 
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=1)
+    start_date = end_date - timedelta(days=7)
 
     # KOSPI와 KOSDAQ 지수 최신 데이터 가져오기
     latest_kospi_data = fdr.DataReader('KS11', start_date, end_date)
@@ -102,6 +102,11 @@ def stock_info(request, stock_code):
     krx_stocks = get_krx_listing()
     stock_info = krx_stocks[krx_stocks['Code'] == stock_code]
     theme_df = pd.read_excel('test/theme.xlsx')
+
+    # 'Code' 열을 문자열로 변환
+    # theme.xlsx에 새로 상장된 주식을 넣으면 datatype이 달라져서
+    stock_info['Code'] = stock_info['Code'].astype(str)
+    theme_df['Code'] = theme_df['Code'].astype(str)
     stock_info = stock_info.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
 
     if stock_info.empty:
@@ -138,7 +143,6 @@ def stock_info(request, stock_code):
         'stock': stock_data,
         'comments': comments,
     })
-
 
 def chart_data(request, stock_code):
     end_date = datetime.now()
@@ -184,6 +188,12 @@ def theme_stocks(request):
     if request.method != 'POST':
         krx_stocks = get_krx_listing()
         theme_df = pd.read_excel('test/theme.xlsx')
+
+        # 'Code' 열을 문자열로 변환
+        # theme.xlsx에 새로 상장된 주식을 넣으면 datatype이 달라져서
+        krx_stocks['Code'] = krx_stocks['Code'].astype(str)
+        theme_df['Code'] = theme_df['Code'].astype(str)
+
         krx_stocks = krx_stocks.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
         krx_stocks = krx_stocks.dropna(subset=['Theme'])
         theme_avg_change = krx_stocks.groupby('Theme')['ChagesRatio'].mean().reset_index()
@@ -204,6 +214,12 @@ def theme_detail(request, theme):
     krx_stocks = get_krx_listing()
     theme_file_path = os.path.join(settings.BASE_DIR, 'static', 'data', 'theme.xlsx')
     theme_df = pd.read_excel(theme_file_path)
+
+    # 'Code' 열을 문자열로 변환
+    # theme.xlsx에 새로 상장된 주식을 넣으면 datatype이 달라져서
+    krx_stocks['Code'] = krx_stocks['Code'].astype(str)
+    theme_df['Code'] = theme_df['Code'].astype(str)
+
     krx_stocks = krx_stocks.merge(theme_df[['Code', 'Theme']], on='Code', how='left')
     theme_stocks = krx_stocks[krx_stocks['Theme'] == theme].sort_values('ChagesRatio', ascending=False)
     theme_stocks_list = theme_stocks.to_dict('records')
