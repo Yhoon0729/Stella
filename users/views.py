@@ -7,8 +7,15 @@ from django.shortcuts import render, redirect
 
 from users.models import User
 
+def generate_verification_code():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
-# Create your views here.
+def send_verification_email(email, code):
+    subject = 'Stella - 인증 코드'
+    message = f'귀하의 인증 코드는 {code}입니다.'
+    from_email = 'vfdgy0729@gmail.com'
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
 
 def signup(request) :
     if 'user_id' in request.session:
@@ -37,17 +44,55 @@ def signup(request) :
         elif user_password != confirm_password :
             context = {"msg" : "비밀번호가 틀립니다", "url" : "/users/signup"}
             return render(request, "alert.html", context)
-        else :
-            user = User(
-                user_id = user_id,
-                user_name = user_name,
-                user_email = user_email,
-                user_password=user_password,
-                gender = gender
-            )
+        else:
+            # 이메일 인증 코드 생성 및 전송
+            verification_code = generate_verification_code()
+            send_verification_email(user_email, verification_code)
 
+            # 세션에 사용자 정보 임시 저장
+            request.session['temp_user_data'] = {
+                'user_id': user_id,
+                'user_name': user_name,
+                'user_email': user_email,
+                'user_password': user_password,
+                'gender': gender,
+                'verification_code': verification_code
+            }
+
+            context = {
+                "msg" : "입력하신 이메일로 인증번호를 보냈습니다.",
+                "url" : "/users/verify_email"
+            }
+            return render(request, "alert.html", context)
+
+
+def verify_email(request):
+    if 'temp_user_data' not in request.session:
+        return redirect('signup')
+
+    if request.method != 'POST':
+        return render(request, "users/verify_email.html")
+    else :
+        entered_code = request.POST.get('verification_code')
+        temp_user_data = request.session['temp_user_data']
+
+        if entered_code == temp_user_data['verification_code']:
+            # 인증 성공, 사용자 생성
+            user = User(
+                user_id=temp_user_data['user_id'],
+                user_name=temp_user_data['user_name'],
+                user_email=temp_user_data['user_email'],
+                user_password=temp_user_data['user_password'],
+                gender=temp_user_data['gender']
+            )
             user.save()
-            context = {"msg" : f"{user_id}님의 회원가입을 환영합니다", "url" : "/users/signin"}
+
+            del request.session['temp_user_data']
+
+            context = {"msg": f"{user.user_id}님의 회원가입을 환영합니다", "url": "/users/signin"}
+            return render(request, "alert.html", context)
+        else:
+            context = {"msg": "인증 코드가 올바르지 않습니다", "url": "/users/verify_email"}
             return render(request, "alert.html", context)
 
 def signin(request) :
@@ -204,18 +249,6 @@ def finduserid(request) :
             "user_id" : user.user_id,
         }
         return render(request, 'users/showuserid.html', context)
-
-
-
-def generate_verification_code():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-
-def send_verification_email(email, code):
-    subject = 'Stella - 인증 코드'
-    message = f'귀하의 인증 코드는 {code}입니다.'
-    from_email = 'vfdgy0729@gmail.com'
-    recipient_list = [email]
-    send_mail(subject, message, from_email, recipient_list)
 
 def findpassword(request):
     if 'user_id' in request.session:

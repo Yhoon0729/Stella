@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stella - 이메일 인증</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/verify_email.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+    {% include 'layouts/header.html' %}
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+            <div class="p-8">
+                <h2 class="text-3xl font-bold mb-6 text-center gradient-text">이메일 인증</h2>
+                <form method="post" action="{% url 'verify_email' %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="verification_code" class="block mb-2">인증 코드</label>
+                        <input type="text" id="verification_code" name="verification_code" required
+                               class="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="이메일로 받은 인증 코드를 입력하세요">
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit"
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition">
+                            인증 코드 확인
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-4 text-center">
+                    <a href="{% url 'signup' %}?resend=1" class="text-blue-400 hover:underline">인증 코드 다시 받기</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'layouts/footer.html' %}
+
+</body>
+</html>

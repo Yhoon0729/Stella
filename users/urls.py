@@ -22,6 +22,7 @@ from users import views
 
 urlpatterns = [
     path("signup/", views.signup, name="signup"),
+    path("verify_email/", views.verify_email, name="verify_email"),
     path("signin/", views.signin, name="signin"),
     path("signout/", views.signout, name="signout"),
     path("userinfo/", views.userinfo, name="userinfo"),
