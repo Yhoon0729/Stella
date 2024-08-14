@@ -1,24 +1,72 @@
-# Virtual Environment
-.venv/
-venv/
-ENV/
-
-# Python cache files
+# Python cache
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 
-# Django specific
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+# Django cache
+.cache/
 
-# IDE specific (예: VS Code, PyCharm)
-.vscode/
-.idea/
+# Pytest cache
+.pytest_cache/
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Coverage cache
+.coverage
+.coverage.*
+
+# mypy cache
+.mypy_cache/
+
+# pytype cache
+.pytype/
+
+# IPython cache
+.ipython/
+
+# Jupyter Notebook cache
+.ipynb_checkpoints/
+
+# Celery cache
+celerybeat-schedule
+celerybeat.pid
+
+# pip cache
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Cython debug symbols
+cython_debug/
+
+# PyBuilder cache
+.pybuilder/
+target/
+
+# PyInstaller cache
+*.manifest
+*.spec
+
+# Hypothesis cache
+.hypothesis/
+
+# Scrapy cache
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# Sass cache
+.sass-cache/
+
+# Node modules (if using any JavaScript tools)
+node_modules/
+
+# Webpack cache
+.webpack/
+
+# Babel cache
+.babel-cache/
+
+# ESLint cache
+.eslintcache
+
+# Browserslist cache
+.browserslistrc
