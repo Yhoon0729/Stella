@@ -1,3 +1,4 @@
+import json
 import os
 from functools import lru_cache
 
@@ -112,7 +113,6 @@ def market_list(request, market):
 
     return render(request, 'stock/market_list.html', context)
 
-
 def stock_info(request, stock_code):
     user_id = request.session.get('user_id')
     krx_stocks = get_krx_listing()
@@ -154,11 +154,13 @@ def stock_info(request, stock_code):
         }
 
     comments = get_comments(stock_code)
-    return render(request, 'stock/info.html', {
+    context = {
         'user_id': user_id,
         'stock': stock_data,
         'comments': comments,
-    })
+    }
+
+    return render(request, 'stock/info.html', context)
 
 def chart_data(request, stock_code):
     end_date = datetime.now()

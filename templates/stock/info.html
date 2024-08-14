@@ -5,22 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ stock.name }} ({{ stock.code }}) - 주식 정보</title>
+    <!-- Tailwind CSS 및 커스텀 CSS 파일 로드 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="{% static 'css/stock_info.css' %}" rel="stylesheet">
+    <!-- TensorFlow.js 및 Chart.js 라이브러리 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
+    <!-- 헤더 포함 -->
     {% include 'layouts/header.html' %}
 
     <main class="container mx-auto px-4 py-8">
+        <!-- 주식 기본 정보 표시 -->
         <h1 class="text-3xl font-bold mb-6 gradient-text">
             <span>{{ stock.name }} ({{ stock.code }})</span>
             <span class="text-sm text-gray-400 ml-4">[{{ stock.market|upper }}]</span>
         </h1>
 
+        <!-- 주식 상세 정보 표시 -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <p class="text-xl">현재가: <span class="font-bold">{{ stock.price }}원</span></p>
+                    <!-- 등락에 따른 색상 변경 -->
                     <p class="{% if stock.change > 0 %}text-red-400{% else %}text-green-400{% endif %}">
                         등락: {{ stock.change }}원 ({{ stock.change_percent }}%)
                     </p>
@@ -30,6 +38,7 @@
                     <p>시가총액: {{ stock.marcap }}</p>
                     <p>산업:
                         {% if stock.theme %}
+                            <!-- 테마 상세 페이지로 링크 -->
                             <a href="{% url 'theme_detail' stock.theme %}" class="text-blue-400 hover:underline">
                                 {{ stock.theme }}
                             </a>
@@ -40,21 +49,24 @@
                 </div>
             </div>
         </div>
+    
 
-        <div id="stockChart" class="w-full h-64 mb-8"></div>
-
+        <!-- 댓글 섹션 -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
             <h2 class="text-2xl font-bold mb-4">댓글</h2>
             {% if user_id %}
+                <!-- 로그인한 사용자를 위한 댓글 작성 폼 -->
                 <form method="post" action="{% url 'comments:add' stock.code %}">
                     {% csrf_token %}
                     <textarea name="content" class="w-full p-2 rounded bg-gray-700 text-white" rows="3" required></textarea>
                     <button type="submit" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">댓글 작성</button>
                 </form>
             {% else %}
+                <!-- 로그인하지 않은 사용자를 위한 안내 메시지 -->
                 <p>댓글을 작성하려면 <a href="{% url 'signin' %}" class="text-blue-400 hover:underline">로그인</a>이 필요합니다.</p>
             {% endif %}
 
+            <!-- 댓글 목록 -->
             <div class="mt-4 space-y-4">
                 {% for comment in comments %}
                     <div class="bg-gray-700 p-4 rounded">
@@ -69,12 +81,15 @@
         </div>
     </main>
 
+    <!-- 푸터 포함 -->
     {% include 'layouts/footer.html' %}
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'js/stock_chart.js' %}"></script>
+    <!-- 주식 코드 및 데이터를 JavaScript 변수로 전달 -->
     <script>
         const stockCode = "{{ stock.code }}";
+        const stockData = {{ stock_data|safe }};  // Django view에서 전달된 주가 데이터
     </script>
+    <!-- 커스텀 JavaScript 파일 로드 -->
+    <script src="{% static 'js/stock_chart_with_prediction.js' %}"></script>
 </body>
 </html>
