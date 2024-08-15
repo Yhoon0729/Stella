@@ -15,7 +15,10 @@ from django.http import JsonResponse
 import FinanceDataReader as fdr
 from datetime import datetime, timedelta
 
+import matplotlib
+matplotlib.use('Agg') # 이 설정은 Tkinter 대신 non-interactive한 Agg 백엔드를 사용하도록 함
 from matplotlib import pyplot as plt
+
 from pykrx import stock
 
 from comments.views import get_comments
@@ -192,15 +195,14 @@ def stock_info(request, stock_code):
             # 이미지를 base64로 인코딩
             graphic = base64.b64encode(image_png).decode('utf-8')
 
-            # 메모리 정리
-            plt.close()
-
             # 컨텍스트에 그래프 데이터 추가
             stock_data['graph'] = graphic
 
         except Exception as e:
             print(f"그래프 생성 중 오류 발생: {e}")
             stock_data['graph'] = None
+        finally:
+            plt.close()  # 항상 figure를 닫아주세요
 
     comments = get_comments(stock_code)
     context = {
