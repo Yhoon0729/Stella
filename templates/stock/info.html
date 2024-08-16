@@ -50,6 +50,23 @@
             </div>
         </div>
     
+        <!-- 주가 그래프 및 예측 섹션 -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-bold mb-4">주가 그래프</h2>
+            <form id="dateForm" class="mb-4">
+                <label for="start_date">시작일:</label>
+                <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="bg-gray-700 text-white p-2 rounded">
+                <label for="end_date">종료일:</label>
+                <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="bg-gray-700 text-white p-2 rounded">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">적용</button>
+            </form>
+            {% if stock.graph %}
+                <img src="data:image/png;base64,{{ stock.graph }}" alt="{{ stock.name }} 주가 그래프" class="w-full mb-4">
+            {% else %}
+                <p class="text-center mb-4">그래프를 불러올 수 없습니다.</p>
+            {% endif %}
+            <div id="predictionInfo" class="text-center"></div>
+        </div>
 
         <!-- 댓글 섹션 -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
@@ -84,12 +101,6 @@
     <!-- 푸터 포함 -->
     {% include 'layouts/footer.html' %}
 
-    <!-- 주식 코드 및 데이터를 JavaScript 변수로 전달 -->
-    <script>
-        const stockCode = "{{ stock.code }}";
-        const stockData = {{ stock_data|safe }};  // Django view에서 전달된 주가 데이터
-    </script>
-    <!-- 커스텀 JavaScript 파일 로드 -->
-    <script src="{% static 'js/stock_chart_with_prediction.js' %}"></script>
+    <script src="{% static 'js/info.js' %}"></script>
 </body>
 </html>

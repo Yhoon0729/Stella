@@ -1,7 +1,11 @@
+import base64
+import io
 import json
 import os
+import time
 from functools import lru_cache
 
+import seaborn as sns
 import pandas as pd
 from django.conf import settings
 from django.core.cache import cache
@@ -10,6 +14,12 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import FinanceDataReader as fdr
 from datetime import datetime, timedelta
+
+import matplotlib
+matplotlib.use('Agg') # 이 설정은 Tkinter 대신 non-interactive한 Agg 백엔드를 사용하도록 함
+from matplotlib import pyplot as plt
+
+from pykrx import stock
 
 from comments.views import get_comments
 
@@ -152,6 +162,47 @@ def stock_info(request, stock_code):
             'volume': formatted_volume,
             'marcap': f"{marcap_in_won:,.0f}억",
         }
+
+        # 날짜 가져오기
+        start_date = request.GET.get('start_date', (datetime.today() - timedelta(days=7)).strftime("%Y%m%d"))
+        end_date = request.GET.get('end_date', datetime.today().strftime("%Y%m%d"))
+
+        try:
+            # 일중 데이터 가져오기
+            df = stock.get_market_ohlcv(start_date, end_date, stock_code)
+            time.sleep(1)
+
+            # 주말 제외
+            df = df[df.index.dayofweek < 5]
+
+            # 그래프 생성
+            plt.figure(figsize=(12, 6))
+            sns.set(style="darkgrid")  # set_style 대신 set 사용
+            sns.lineplot(x=df.index.strftime('%Y-%m-%d'), y=df['종가'])
+            plt.title(f"{stock_data['name']} ({stock_code}) 주가 추이")
+            plt.xlabel("날짜")
+            plt.ylabel("종가 (원)")
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+
+            # 그래프를 이미지로 저장
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_png = buffer.getvalue()
+            buffer.close()
+
+            # 이미지를 base64로 인코딩
+            graphic = base64.b64encode(image_png).decode('utf-8')
+
+            # 컨텍스트에 그래프 데이터 추가
+            stock_data['graph'] = graphic
+
+        except Exception as e:
+            print(f"그래프 생성 중 오류 발생: {e}")
+            stock_data['graph'] = None
+        finally:
+            plt.close()  # 항상 figure를 닫아주세요
 
     comments = get_comments(stock_code)
     context = {
