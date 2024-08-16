@@ -215,16 +215,6 @@ def stock_info(request, stock_code):
 
     return render(request, 'stock/info.html', context)
 
-def chart_data(request, stock_code):
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=30)
-    df = cached_data_reader(stock_code, start_date, end_date)
-    data = {
-        'labels': df.index.strftime('%Y-%m-%d').tolist(),
-        'prices': df['Close'].tolist(),
-    }
-    return JsonResponse(data)
-
 
 def search_stocks(request):
     query = request.GET.get('query', '').strip()
