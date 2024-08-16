@@ -1,14 +1,11 @@
 import base64
 import io
-import json
 import os
 import time
-from functools import lru_cache
 
 import seaborn as sns
 import pandas as pd
 from django.conf import settings
-from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -23,22 +20,27 @@ from pykrx import stock
 
 from comments.views import get_comments
 
+class KRXListing:
+    def __init__(self):
+        self._cache_time = 0
+        self._cache_lifetime = 60  # 1분
+        self._listing = None
 
-@lru_cache(maxsize=1)
+    def _get_listing(self):
+        self._cache_time = time.time()
+        self._listing = fdr.StockListing('KRX')
+        return self._listing
+
+    def get_krx_listing(self):
+        if self._listing is None or (time.time() - self._cache_time > self._cache_lifetime):
+            return self._get_listing()
+        return self._listing
+
+# 전역 인스턴스 생성
+krx_listing = KRXListing()
+
 def get_krx_listing():
-    return fdr.StockListing('KRX')
-
-
-def cached_data_reader(code, start_date, end_date):
-    cache_key = f'stock_data_{code}_{start_date}_{end_date}'
-    cached_data = cache.get(cache_key)
-    if cached_data is not None:
-        return pd.read_json(cached_data)
-
-    data = fdr.DataReader(code, start_date, end_date)
-    cache.set(cache_key, data.to_json(), timeout=30)  # 30초 동안 캐시
-    return data
-
+    return krx_listing.get_krx_listing()
 def index(request):
     # KRX 주식 목록 가져오기
     krx_stocks = get_krx_listing()
