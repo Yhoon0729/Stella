@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 
 from users.models import User
 
+'''
 def generate_verification_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
@@ -16,6 +17,7 @@ def send_verification_email(email, code):
     from_email = 'vfdgy0729@gmail.com'
     recipient_list = [email]
     send_mail(subject, message, from_email, recipient_list)
+'''
 
 def signup(request) :
     if 'user_id' in request.session:
@@ -45,6 +47,19 @@ def signup(request) :
             context = {"msg" : "비밀번호가 틀립니다", "url" : "/users/signup"}
             return render(request, "alert.html", context)
         else:
+            user = User(
+                user_id=user_id,
+                user_name=user_name,
+                user_email=user_email,
+                user_password=user_password,
+                gender=gender
+            )
+            user.save()
+
+            context = {"msg": f"{user.user_id}님의 회원가입을 환영합니다", "url": "/users/signin"}
+            return render(request, "alert.html", context)
+
+            '''
             # 이메일 인증 코드 생성 및 전송
             verification_code = generate_verification_code()
             send_verification_email(user_email, verification_code)
@@ -64,8 +79,10 @@ def signup(request) :
                 "url" : "/users/verify_email"
             }
             return render(request, "alert.html", context)
+            '''
 
 
+'''
 def verify_email(request):
     if 'temp_user_data' not in request.session:
         return redirect('signup')
@@ -94,6 +111,7 @@ def verify_email(request):
         else:
             context = {"msg": "인증 코드가 올바르지 않습니다", "url": "/users/verify_email"}
             return render(request, "alert.html", context)
+'''
 
 def signin(request) :
     if 'user_id' in request.session:
@@ -270,14 +288,11 @@ def findpassword(request):
             context = {"msg": "입력한 정보와 일치하는 사용자가 없습니다.", "url": "/users/findpassword"}
             return render(request, 'alert.html', context)
 
-        code = generate_verification_code()
-        user.reset_password_token = code
-        user.save()
-        send_verification_email(user_email, code)
         request.session['reset_email'] = user_email
         request.session['reset_user_id'] = user_id
-        return redirect('verify_code')
+        return redirect('resetpassword')
 
+'''
 def verify_code(request):
     if 'user_id' in request.session:
         return redirect('index')
@@ -301,6 +316,7 @@ def verify_code(request):
         except User.DoesNotExist:
             context = {"msg" : "인증 코드가 올바르지 않습니다", "url" : "/users/verify_code"}
             return render(request, 'alert.html', context)
+'''
 
 
 def resetpassword(request):

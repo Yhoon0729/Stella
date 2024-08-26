@@ -41,6 +41,7 @@ krx_listing = KRXListing()
 
 def get_krx_listing():
     return krx_listing.get_krx_listing()
+
 def index(request):
     # KRX 주식 목록 가져오기
     krx_stocks = get_krx_listing()
@@ -204,7 +205,7 @@ def stock_info(request, stock_code):
             print(f"그래프 생성 중 오류 발생: {e}")
             stock_data['graph'] = None
         finally:
-            plt.close()  # 항상 figure를 닫아주세요
+            plt.close()
 
     comments = get_comments(stock_code)
     context = {

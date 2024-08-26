@@ -22,7 +22,6 @@ from users import views
 
 urlpatterns = [
     path("signup/", views.signup, name="signup"),
-    path("verify_email/", views.verify_email, name="verify_email"),
     path("signin/", views.signin, name="signin"),
     path("signout/", views.signout, name="signout"),
     path("userinfo/", views.userinfo, name="userinfo"),
@@ -31,6 +30,7 @@ urlpatterns = [
     path("userdelete/", views.userdelete, name="userdelete"),
     path("finduserid/", views.finduserid, name="finduserid"),
     path("findpassword/", views.findpassword, name="findpassword"),
-    path("verify_code/", views.verify_code, name="verify_code"),
     path("resetpassword/", views.resetpassword, name="resetpassword"),
+    # path("verify_email/", views.verify_email, name="verify_email"),
+    # path("verify_code/", views.verify_code, name="verify_code"),
 ]
